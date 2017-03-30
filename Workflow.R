@@ -7,11 +7,18 @@
     require(tidyr)
     require(dplyr)
 ################################################################################
-    #  Data
-    setwd("D:/Scotland")
-    rawd <- read_csv("Scotland molt phenology data_averages.csv")
+    #  Set working directory
+    setwd("/Users/marketzimova/Documents/WORK/DISSERTATION/2 Scotland/GitHub/ScottishHares") #MZ
+    #setwd("/Users/...") #Josh
 
-    #  Format data
-    dat <- morph_data(rawd)
+    #  Source functions
+    source("helpers/Utility_funs.R")
+
+################################################################################
+    #  Load data and add temporal bits
+    hare_dat <- readr::read_csv("/Users/marketzimova/Documents/WORK/DISSERTATION/2 Scotland/ANALYSIS and DATA/Scotland molt phenology data_averages.csv") 
+    #hare_dat <- readr::read_csv("/Users/marketzimova/Documents/WORK/DISSERTATION/2 Scotland/ANALYSIS and DATA/Scotland molt phenology data_averages.csv") #Josh 
+    morph_data(hare_dat)
+################################################################################    
     
     
