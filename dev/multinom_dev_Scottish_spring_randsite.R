@@ -11,7 +11,6 @@ library(purrr)
 library(dplyr)
 library(beepr)
 library(mcmcplots)
-require(dplyr)
 library(lubridate)
 require(ggplot2)
 ################################################################################
@@ -22,7 +21,7 @@ setwd("/Users/marketzimova/Documents/WORK/DISSERTATION/GitHub/ScottishHares")
 
 ################################################################################
 #  Source functions
-source("code/utility_functions.R")
+source("code/utility_functions_Scottish.R")
 
 #  Load data
 rawd <-read.csv("/Users/marketzimova/Documents/WORK/DISSERTATION/2 Scotland/data/Scotland molt phenology data_averagesNEW.csv", header=T,sep=",")
@@ -30,18 +29,18 @@ rawd <-read.csv("/Users/marketzimova/Documents/WORK/DISSERTATION/2 Scotland/data
 ################################################################################
 #  Morph raw data
 stripped <- morph_data(rawd)
-replicated <- stripped[rep(row.names(stripped), stripped$Count), 1:7]
-
-Means <-replicated  %>%
-   group_by(Area,Year, Season) %>%
-   summarise(n())
-View(arrange(Means, desc(Season), Area))
+replicated <- stripped[rep(row.names(stripped), stripped$Count), 1:8]
+str(replicated)
+# Means <-replicated  %>%
+#    group_by(Area,Year, Season) %>%
+#    summarise(n())
+# View(arrange(Means, desc(Season), Area))
 
 hares <- replicated %>%
   filter(
-    Season == "Spring",
-    Year == 1955,
-    Area == "Corn"
+    Season == "Spring"
+    #Year == 1955,
+    #Area == "Corn"
     #Area %in% c("CoigL","CoigH")
   )
 
@@ -72,17 +71,18 @@ inits <- function(){
 dat <- list(
   nobs = nrow(hares),
   day = days, 
-  #cam = as.numeric(as.factor(hares$CameraNum)),
+  cam = as.numeric(as.factor(hares$CameraNum)),
   y = response,
   nbins = 5,
-  ndays = last_day #,
-  #ncam = length(unique(hares$CameraNum)),
+  ndays = last_day,
+  ncam = length(unique(hares$CameraNum))
   #elev = as.numeric(hares$Elevation)
 )
 
 # Parameters to monitor
-parms <- c("p", "beta", "alpha"
+parms <- c("pp", "beta", "alpha"
   )
+
 
 #  Call jags
 start.time <- Sys.time()
@@ -90,7 +90,7 @@ out <- jags(
   data = dat, 
   inits = NULL,
   parameters.to.save = parms,
-  model.file = "models/multinom_norandoms.txt", 
+  model.file = "models/multinom_randomSite.txt", 
   n.chains = 3,
   n.iter = 100000,
   n.burnin = 50000,
