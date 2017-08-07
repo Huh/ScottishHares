@@ -22,7 +22,7 @@ setwd("/Users/marketzimova/Documents/WORK/DISSERTATION/GitHub/ScottishHares")
 
 ################################################################################
 #  Source functions
-source("code/utility_functions.R")
+source("code/utility_functions_Scottish.R")
 
 #  Load data
 rawd <-read.csv("/Users/marketzimova/Documents/WORK/DISSERTATION/2 Scotland/data/Scotland molt phenology data_averagesNEW.csv", header=T,sep=",")
@@ -35,13 +35,13 @@ replicated <- stripped[rep(row.names(stripped), stripped$Count), 1:7]
 Means <-replicated  %>%
    group_by(Area,Year, Season) %>%
    summarise(n())
-View(arrange(Means, desc(Season), Area))
+#View(arrange(Means, desc(Season), Area))
 
 hares <- replicated %>%
   filter(
     Season == "Spring",
-    Year == 1955,
-    Area == "Corn"
+    Year == 1955#,
+    #Area == "Corn"
     #Area %in% c("CoigL","CoigH")
   )
 
