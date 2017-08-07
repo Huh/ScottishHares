@@ -12,13 +12,13 @@ model{
     beta[i] ~ dnorm(0, 0.001)
   }
 
-  for(i in 1:4){
+  for(i in 1:(nbins - 1)){ #prev had 'i in 1:2'
     tau_cam[i] ~ dunif(0, 100)
     sig_cam[i] <- 1/sqrt(tau_cam[i])
+
     for(c in 1:ncam){
       cam_eff[i, c] ~ dnorm(0, tau_cam[i])
     }
-  }
 
   for(c in 1:ncam){
     for(d in 1:ndays){

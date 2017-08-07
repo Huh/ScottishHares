@@ -1,3 +1,9 @@
+Is it all sites or just the best ones- check utility
+Why are the 5 lines for random effects (changed some for loop for 4 from 2)
+  Check what it looked like previously with 5 categories
+
+
+
 #  Multinomial analysis to calculate molt start and end dates 
 #     (and covariates effects) in Scottish hares
 # 3 categories of molt
@@ -38,8 +44,8 @@ str(replicated)
 
 hares <- replicated %>%
   filter(
-    Season == "Spring"
-    #Year == 1955,
+    Season == "Spring",
+    Year < 2000
     #Area == "Corn"
     #Area %in% c("CoigL","CoigH")
   )
@@ -80,7 +86,7 @@ dat <- list(
 )
 
 # Parameters to monitor
-parms <- c("pp", "beta", "alpha"
+parms <- c("pp", "beta", "alpha", "p_rand"
   )
 
 
@@ -92,8 +98,8 @@ out <- jags(
   parameters.to.save = parms,
   model.file = "models/multinom_randomSite.txt", 
   n.chains = 3,
-  n.iter = 100000,
-  n.burnin = 50000,
+  n.iter = 50000,
+  n.burnin = 20000,
   n.thin = 3
 )
 end.time <- Sys.time();(time.taken <-end.time-start.time)
@@ -107,7 +113,7 @@ beep()
 # Save results as csv
 #writes csv with results
   out.sum <- out$BUGS$summary 
-  write.table(out.sum, file="results/Corn_S1955_100K.csv",sep=",")
+  write.table(out.sum, file="results/Springs before 2000_100K.csv",sep=",")
 
 options(max.print=200) #extend maximum for print
 print(out)
@@ -115,21 +121,21 @@ print(out)
 ################################################################################
 # Plots
 #  Find start dates
-starts <- apply(out$BUGS$sims.list$p[,5,], 1, function(x){ 
+starts <- apply(out$BUGS$sims.list$pp[,5,], 1, function(x){ 
   min(which(x < 0.5)) 
 })
 hist(starts, xlab = "Day")
 quantile(starts, c(0.025, 0.5, 0.975))
 
 #  Find end dates
-ends <- apply(out$BUGS$sims.list$p[,1,], 1, function(x){ 
+ends <- apply(out$BUGS$sims.list$pp[,1,], 1, function(x){ 
   min(which(x > 0.5)) 
 })
 hist(ends, xlab = "Day")
 quantile(ends, c(0.025, 0.5, 0.975))
 
 #  Find mid-points
-mids <- apply(out$BUGS$sims.list$p[,3,], 1, function(x){ 
+mids <- apply(out$BUGS$sims.list$pp[,3,], 1, function(x){ 
   min(which(x == max(x)))
 })
 hist(mids, xlab = "Day")
@@ -140,11 +146,11 @@ plot(0, 0, type = "n", col = "red", bty = "l",
      ylim = c(-.1, 1.1), xlim = c(0, 200),
      xlab = "Time", ylab = "Probability of being in bin 'x'")
 
-day_seq <- 1:dim(out$BUGS$mean$p)[2]
+day_seq <- 1:dim(out$BUGS$mean$pp)[2]
 points(hares$Julian, jitter(hares$Color/10), pch = 19, cex = 1, col = "gray70")
 
 for(i in 1:5){
-  lines(day_seq, out$BUGS$mean$p[i,], col = i, type = "l")
+  lines(day_seq, out$BUGS$mean$pp[i,], col = i, type = "l")
 }
 abline(v=c(quantile(starts, 0.5)), col="green");abline(v=c(quantile(mids, 0.5)), col="red");abline(v=c(quantile(ends, 0.5)), col="black")
 abline(v=c(quantile(starts, 0.025), quantile(starts, 0.975)), col = "green", lty = 3)
@@ -153,7 +159,7 @@ abline(v=c(quantile(ends, 0.025), quantile(ends, 0.975)), col = "black", lty = 3
 hist(starts, add = T, freq = F, col = "green", border = "green")
 hist(ends, add = T, freq = F, col = "black", border = "black")  
 hist(mids, add = T, freq = F, col = "red", border = "red")  
-text(0, 0.2, paste("Corn_S1955_100K",
+text(0, 0.2, paste("Springs b4 2000_50K",
                    #"\nelev_eff1 =", quantile(signif(out$BUGS$sims.list$elev_eff[,1],digits=2),0.025),quantile(signif(out$BUGS$sims.list$elev_eff[,1],digits=2),0.5),quantile(signif(out$BUGS$sims.list$elev_eff[,1],digits=2),0.925),
                    #"\nelev_eff2 =", quantile(signif(out$BUGS$sims.list$elev_eff[,2],digits=2),0.025),quantile(signif(out$BUGS$sims.list$elev_eff[,2],digits=2),0.5),quantile(signif(out$BUGS$sims.list$elev_eff[,2],digits=2),0.925),
                    "\nStarts =", quantile(starts, 0.025),quantile(starts, 0.5),quantile(starts, 0.975),
@@ -193,15 +199,16 @@ for(i in 1:nrow(mat)){
 #mat
 
 #  Add lines to plot for each camera
-points(hares$Julian, jitter(hares$White3/100), pch = 19, cex = 1, col = "gray80")
+points(hares$Julian, jitter(hares$Color/10), pch = 19, cex = 1, col = "gray90")
+
 for(i in 1:ncategories){
   for(j in 1:ncamera){
-    lines(day_seq, out$BUGS$mean$p_rand[i,j,], col = "gray70", type = "l") #or col =i
+    lines(day_seq, out$BUGS$mean$p_rand[i,j,], col = i, type = "l") #or col =i
   }
 }
 
-for(i in 1:3){
-  lines(day_seq, out$BUGS$mean$pp[i,], col = i, type = "l")
+for(i in 1:5){
+  lines(day_seq, out$BUGS$mean$pp[i,], col = "black", type = "l")
 }
 abline(v=c(quantile(starts, 0.5)), col="green");abline(v=c(quantile(mids, 0.5)), col="red");abline(v=c(quantile(ends, 0.5)), col="black")
 abline(v=c(quantile(starts, 0.025), quantile(starts, 0.975)), col = "green", lty = 3)

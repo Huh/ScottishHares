@@ -19,7 +19,7 @@ stripped <- rawd %>%
           "Punch","EskL","EskH","Muick"), 
         Use!='no',
         Count>0) %>% 
-  select(Area, Date, Count, Color, Season, Julian, Year,CameraNum)  
+  select(Area, Date, Count, Color, Season, Julian, Year, CameraNum)  
 }
 
 # Replicate by counts
