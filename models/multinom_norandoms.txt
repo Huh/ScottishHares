@@ -18,9 +18,9 @@ model{
       beta[1] * d
     log(p_exp[2,d]) <- alpha[2] +
       beta[2] * d
-    log(p_exp[3,d]) <- alpha[2] +
+    log(p_exp[3,d]) <- alpha[3] +
       beta[3] * d
-    log(p_exp[4,d]) <- alpha[2] +
+    log(p_exp[4,d]) <- alpha[4] +
       beta[4] * d
     log(p_exp[5,d]) <- 0
 
