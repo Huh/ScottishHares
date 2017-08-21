@@ -5,9 +5,16 @@
     #  Packages
     require(R2jags)
     require(readr)
+    require(lubridate)
     require(tidyr)
     require(dplyr)
 ################################################################################
+    #  Josh wd
+    setwd("C:/Users/josh.nowak/Documents/Marketa/data")
+    
+    #  Source utility funs
+    source("C:/Users/josh.nowak/Documents/GitHub/ScottishHares/code/utility_function_joshOLD.R")
+
     #  Data
     setwd("D:/Scotland")
     rawd <- read_csv("Scotland molt phenology data_averages.csv")
@@ -44,7 +51,7 @@
       data = j_data,
       inits = j_inits,
       parameters.to.save = j_param,
-      model.file = "C:/Users/josh.nowak/Documents/GitHub/ScottishHares/mutlinom.txt",
+      model.file = "C:/Users/josh.nowak/Documents/GitHub/ScottishHares/models/multinom_norandoms.txt",
       n.chains = 3,
       n.iter = 1000,
       n.burnin = 500,
